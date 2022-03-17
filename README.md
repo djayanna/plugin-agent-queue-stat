@@ -1,6 +1,10 @@
-# Your custom Twilio Flex Plugin
+# Twilio Flex Plugin - Agent Real-Time Queues View
 
-Twilio Flex Plugins allow you to customize the appearance and behavior of [Twilio Flex](https://www.twilio.com/flex). If you want to learn more about the capabilities and how to use the API, check out our [Flex documentation](https://www.twilio.com/docs/flex).
+This Flex Plugin adds Real-Time Queues View to the Flex Agent UI. These data refresh every 1 to 3 seconds and are visible to users with the `agent` role.
+
+The data is sourced from Sync maps and stored in a custom Redux store (namespace: `agent-queue-stat`)
+
+![Agent Queue Stats ](images/AgentView.gif)
 
 ## Setup
 
