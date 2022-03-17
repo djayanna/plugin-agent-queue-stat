@@ -20,18 +20,7 @@ export default class AgentQueueStatPlugin extends FlexPlugin {
    * @param manager { import('@twilio/flex-ui').Manager }
    */
   async init(flex, manager) {
-    this.registerReducers(manager);
-
-    // const syncClient = manager.insightsClient;
-
-    // const options = { sortOrder: -1 };
-    // flex.AgentDesktopView.Panel1.Content.add(
-    //   <CustomTaskListContainer key="AgentQueueStatPlugin-component" />,
-    //   options
-    // );
-
-
-    
+    this.registerReducers(manager);   
     if (this.showAgentQueueStat(manager)) {
       flex.ViewCollection.Content.add(
         <flex.View name="agent-queues-stats" key="agent-queues-stats">

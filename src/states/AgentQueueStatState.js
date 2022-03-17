@@ -44,9 +44,7 @@ export class Actions {
 }
 
 const updateQueueStatsTasksNow = produce((draft, queue_meta, queue, channel) => {
-    
 
-  console.log("updateQueueStatsTasksNow", queue);
     draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || {};
     const draft_queue = draft.queuesList[queue_meta.queue_sid];
 
@@ -93,7 +91,7 @@ const updateQueueStatsTasksSlaToday = produce((draft, queue_meta, queue, channel
 
     draft_queue.channels =  draft_queue.channels || {};  
     
-    Object.keys(channel).forEach(function(key) {
+    Object.keys(channel).forEach((key) => {
 
       draft_queue.channels[key] =  draft_queue.channels[key] || {};
       draft_queue.channels[key].sla_today = channel[key];
@@ -129,9 +127,6 @@ export function reduce(state = initialState, action) {
     }
 
     case ACTION_UPDATE_QUEUE_STATS_TASKS_NOW: {
-      // console.log("queue meta", action.queue);
-      // console.log("value", action.value);
-
       const { queue_meta, queue, channel } = action;
       return updateQueueStatsTasksNow(state, queue_meta, queue, channel);
     }
