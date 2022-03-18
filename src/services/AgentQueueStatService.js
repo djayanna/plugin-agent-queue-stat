@@ -44,8 +44,7 @@ class AgentQueueStatService {
 
   #initializeQueueStats = async () => {
     try {
-    
-    // Subscribe to workspace realtime stats
+      // Subscribe to workspace realtime stats
       this.#workspaceStatsMap = await this.#syncClient.map({
         id: this.#Config.WORKSPACE_STATS_MAP_NAME,
         mode: "open_existing",
@@ -59,11 +58,13 @@ class AgentQueueStatService {
         }
       });
     } catch (error) {
-      console.error(`Error subscribing to ${this.#Config.WORKSPACE_STATS_MAP_NAME} `, error);
+      console.error(
+        `Error subscribing to ${this.#Config.WORKSPACE_STATS_MAP_NAME} `,
+        error
+      );
     }
     try {
-    
-       // Get workspace realtime stats 
+      // Get workspace realtime stats
       const workspaceStats = await this.#workspaceStatsMap.get(
         this.#Config.WORKSPACE_STATS_KEY
       );
@@ -74,25 +75,29 @@ class AgentQueueStatService {
 
       // Get list of queues from 'tr-queue' index
       let queues = await this.#fetchTRQueues();
- 
-      // Get collection of queue realtime stats maps
-      this.#maps = await this.#subQueueMaps(queues);
 
-      // subscribe to queue maps
-      this.#maps.forEach(async (map) => {
-        const queue = this.#findQueueByMap(map, queues);
-        let page = await map.getItems();
+      if (queues && queues.length > 1) {
+        // Get collection of queue realtime stats maps
+        this.#maps = await this.#subQueueMaps(queues);
 
-        this.#pageHandler(page, queue, this.#queueStatItemUpdated);
+        // subscribe to queue maps
+        this.#maps.forEach(async (map) => {
+          const queue = this.#findQueueByMap(map, queues);
+          let page = await map.getItems();
 
-        map.on("itemAdded", (item) =>
-          this.#queueStatItemUpdated(queue, item.item)
-        );
+          this.#pageHandler(page, queue, this.#queueStatItemUpdated);
 
-        map.on("itemUpdated", (item) => {
-          this.#queueStatItemUpdated(queue, item.item);
+          map.on("itemAdded", (item) =>
+            this.#queueStatItemUpdated(queue, item.item)
+          );
+
+          map.on("itemUpdated", (item) => {
+            this.#queueStatItemUpdated(queue, item.item);
+          });
         });
-      });
+      } else {
+        console.warn("no queues found");
+      }
     } catch (e) {
       console.error("error initializing sync maps ", e);
     }
@@ -171,9 +176,18 @@ class AgentQueueStatService {
   };
 
   #fetchTRQueues = async () => {
-    let q = await this.#syncClient.liveQuery(this.#Config.TASK_QUEUE_INDEX, "");
-    let result = Object.values(q.getItems()).map((i) => i);
-    return result;
+    try {
+      let result;
+      const queueSearch = (
+        await this.#syncClient.instantQuery(this.#Config.TASK_QUEUE_INDEX)
+      ).on("searchResult", (items) => {
+        result = Object.values(items).map((i) => i);
+      });
+      await queueSearch.search("");
+      return result;
+    } catch (error) {
+      console.log("error reading queues", error);
+    }
   };
 }
 
