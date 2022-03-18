@@ -45,7 +45,7 @@ export class Actions {
 
 const updateQueueStatsTasksNow = produce((draft, queue_meta, queue, channel) => {
 
-    draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || {};
+    draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || intializeQueue();
     const draft_queue = draft.queuesList[queue_meta.queue_sid];
 
     (draft_queue.key = queue_meta.queue_sid),
@@ -75,7 +75,7 @@ const updateQueueStatsTasksNow = produce((draft, queue_meta, queue, channel) => 
 );
 
 const updateWorkerActivitiesStats = produce((draft, queue_meta, queue) => {
-  draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || {};
+  draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || intializeQueue();
 
   const draft_queue = draft.queuesList[queue_meta.queue_sid];
   draft_queue.total_available_workers = queue.total_available_workers;
@@ -84,7 +84,7 @@ const updateWorkerActivitiesStats = produce((draft, queue_meta, queue) => {
 });
 
 const updateQueueStatsTasksSlaToday = produce((draft, queue_meta, queue, channel) => {
-      draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || {};
+      draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || intializeQueue();
     
     const draft_queue = draft.queuesList[queue_meta.queue_sid];
     draft_queue.sla_today = queue;
@@ -100,7 +100,7 @@ const updateQueueStatsTasksSlaToday = produce((draft, queue_meta, queue, channel
 );
 
 const updateQueueStatsTasksSla30Min = produce((draft, queue_meta, queue, channel) => {
-  draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || {};
+  draft.queuesList[queue_meta.queue_sid] = draft.queuesList[queue_meta.queue_sid] || intializeQueue();
 
     const draft_queue = draft.queuesList[queue_meta.queue_sid];
     draft_queue.sla_30_min = queue;
@@ -115,11 +115,38 @@ const updateQueueStatsTasksSla30Min = produce((draft, queue_meta, queue, channel
   }
 );
 
+const intializeQueue = () => {
+
+  return {
+    key: '',
+    friendly_name: '',
+    tasks_by_priority: 0,
+    tasks_by_status: {
+      reserved: 0,
+      pending: 0,
+      assigned: 0,
+      wrapping: 0,
+    },
+    total_tasks: 0,
+    longest_task_waiting_sid :0,
+    longest_task_waiting_from :0,
+    total_available_workers: 0,
+    total_eligible_workers: 0,
+    activity_statistics: 0,
+    sla_today: {},
+    sla_30_min: {},
+    channels: {}
+  };
+
+}
+
 export function reduce(state = initialState, action) {
   
   // eslint-disable-next-line sonarjs/no-small-switch
   switch (action.type) {
     case ACTION_SET_WORKSPACE_STATS: {
+
+      console.log("workspace", action);
       return {
         ...state,
         workspaceStats: action.value,

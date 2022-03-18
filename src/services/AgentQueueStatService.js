@@ -54,7 +54,7 @@ class AgentQueueStatService {
       this.#workspaceStatsMap.on("itemUpdated", (item) => {
         if (item.key === this.#Config.WORKSPACE_STATS_KEY) {
           Manager.getInstance().store.dispatch(
-            Actions.setWorkSpaceStats(workspaceStats)
+            Actions.setWorkSpaceStats(workspaceStats.value)
           );
         }
       });
@@ -65,7 +65,7 @@ class AgentQueueStatService {
     
        // Get workspace realtime stats 
       const workspaceStats = await this.#workspaceStatsMap.get(
-        this.#Config.workspaceStatsKey
+        this.#Config.WORKSPACE_STATS_KEY
       );
 
       Manager.getInstance().store.dispatch(
